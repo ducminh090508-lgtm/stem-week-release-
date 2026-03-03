@@ -1,0 +1,4 @@
+textual>=0.30.0
+websockets>=11.0
+rich>=13.0
+art>=5.0
