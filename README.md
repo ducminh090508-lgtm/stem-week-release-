@@ -42,6 +42,59 @@ production/
 
 ## Quick Setup (On Event Day)
 
+### Using Docker (Recommended for No-Setup Deployment)
+
+If you have Docker and Docker Compose installed, deploy both apps in containers with one command:
+
+```bash
+# from the production folder
+docker-compose up -d
+```
+
+This creates isolated containers for both admin and user apps:
+- **Admin UI**: Connected inside the container, stdin/tty enabled
+- **User UI**: Connected inside the container, stdin/tty enabled
+- Both read config from local `config.ini` files (mounted read-only)
+- Both connected via internal bridge network `stemweek-network`
+
+To stop:
+
+```bash
+docker-compose down
+```
+
+To rebuild images after changes:
+
+```bash
+docker-compose build --no-cache
+```
+
+### Building Individual Docker Images
+
+If you prefer to manage containers separately:
+
+```bash
+# admin image
+cd admin-app
+docker build -t stemweek-admin .
+cd ..
+
+# user image
+cd user-app
+docker build -t stemweek-user .
+cd ..
+```
+
+Run with mounted config:
+
+```bash
+# admin
+docker run -it --rm -v ./admin-app/config.ini:/etc/stemweek/admin-config.ini stemweek-admin
+
+# user
+docker run -it --rm -v ./user-app/config.ini:/etc/stemweek/user-config.ini stemweek-user
+```
+
 ### For Admin Team
 
 1. **Extract** the `admin-app` folder to a location on your admin computer
@@ -72,12 +125,42 @@ production/
 
 ## System Requirements
 
+### Traditional (Native Install)
+
 - **Python 3.8+** (Install from [python.org](https://www.python.org/downloads/))
 - **Internet connection** to reach the server
 - **Terminal/Command Prompt** with UTF-8 support
 - Compatible with Windows, macOS, and Linux
 
+### Docker (No Python Required)
+
+- **Docker** and **Docker Compose** installed
+- **Internet connection** to reach the server
+- Compatible with Windows (Docker Desktop), macOS (Docker Desktop), and Linux
+
 ## First-Time Setup Instructions
+
+### Docker Installation (Optional)
+
+1. **Install Docker & Docker Compose**:
+   - **Windows/macOS**: Download [Docker Desktop](https://www.docker.com/products/docker-desktop)
+   - **Linux**: Follow [Docker Engine install](https://docs.docker.com/engine/install/)
+
+2. **Verify Installation**:
+   ```bash
+   docker --version
+   docker-compose --version
+   ```
+
+3. **Quick Start**:
+   ```bash
+   cd production
+   docker-compose up -d     # launch both apps in containers
+   docker-compose logs -f   # view logs
+   docker-compose down      # stop when done
+   ```
+
+Docker removes the need for Python installation—everything runs in isolated containers.
 
 ### Windows Users
 
@@ -162,40 +245,6 @@ production/
 - `3` - Leaderboard
 - `escape` - Back
 - `q` - Quit
-
-## Network Configuration
-
-## Containerised Deployment
-
-If a machine doesn’t have Python installed (e.g. a kiosk), you can run either app in a Docker container. Each subfolder now contains a `Dockerfile`.
-
-Build an image from the appropriate folder:
-
-```sh
-# admin container
-cd admin-app
-docker build -t stemweek-admin .
-
-# user container
-cd ../user-app
-docker build -t stemweek-user .
-```
-
-Run the container, mounting a configuration file from the host:
-
-```sh
-# start admin UI
-docker run --rm -it \
-    -v /path/to/my-admin-config.ini:/etc/stemweek/config.ini \
-    stemweek-admin
-
-# start user UI
-docker run --rm -it \
-    -v /path/to/my-user-config.ini:/etc/stemweek/config.ini \
-    stemweek-user
-```
-
-Config volumes allow you to change server IP without rebuilding.
 
 ## Network Configuration
 

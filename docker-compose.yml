@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  admin:
+    build:
+      context: ./admin-app
+      dockerfile: Dockerfile
+    container_name: stemweek-admin
+    image: stemweek-admin:latest
+    stdin_open: true
+    tty: true
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./admin-app/config.ini:/etc/stemweek/admin-config.ini:ro
+    environment:
+      CONFIG_PATH: /etc/stemweek/admin-config.ini
+    networks:
+      - stemweek-network
+    restart: unless-stopped
+
+  user:
+    build:
+      context: ./user-app
+      dockerfile: Dockerfile
+    container_name: stemweek-user
+    image: stemweek-user:latest
+    stdin_open: true
+    tty: true
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./user-app/config.ini:/etc/stemweek/user-config.ini:ro
+    environment:
+      CONFIG_PATH: /etc/stemweek/user-config.ini
+    networks:
+      - stemweek-network
+    restart: unless-stopped
+
+networks:
+  stemweek-network:
+    driver: bridge
